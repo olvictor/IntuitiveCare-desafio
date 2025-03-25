@@ -5,16 +5,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class ScrapingService {
     private static final String DIRETORIO_DOWN = "downloads/";
-    private static final String ARQUIVO_ZIP = "anexos.zip";
+    private static final String ARQUIVOS_ZIP = "anexos.zip";
 
     public static void scraping(String url) throws IOException {
 
@@ -31,6 +31,9 @@ public class ScrapingService {
              System.out.println("Baixando: " + pdfLink);
              baixarArquivos(pdfLink, DIRETORIO_DOWN + fileName);
           }
+
+          ziparArquivos(DIRETORIO_DOWN, DIRETORIO_DOWN + ARQUIVOS_ZIP);
+
         }
 
     }
@@ -41,6 +44,26 @@ public class ScrapingService {
             int bytesRead;
             while ((bytesRead = in.read(buffer)) != -1) {
                 out.write(buffer, 0, bytesRead);
+            }
+        }
+
+    }
+
+    private  static void ziparArquivos(String sourceDir, String zipFile) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(zipFile);
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+            File dir = new File(sourceDir);
+            for (File file : dir.listFiles()) {
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    ZipEntry zipEntry = new ZipEntry(file.getName());
+                    zos.putNextEntry(zipEntry);
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = fis.read(buffer)) > 0) {
+                        zos.write(buffer, 0, len);
+                    }
+                    zos.closeEntry();
+                }
             }
         }
     }
