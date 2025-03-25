@@ -23,4 +23,14 @@ public class ScrapingService {
         Elements links = documento.select("a[href$=.pdf]");
 
     }
+    private void baixarArquivos(String arquivoURL, String savePath) throws IOException {
+        try (InputStream in = new URL(arquivoURL).openStream();
+             FileOutputStream out = new FileOutputStream(savePath)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        }
+    }
 }
