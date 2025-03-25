@@ -2,6 +2,7 @@ package com.IntuitiveCare.service;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.FileOutputStream;
@@ -22,8 +23,18 @@ public class ScrapingService {
         Document documento = Jsoup.connect(url).get();
         Elements links = documento.select("a[href$=.pdf]");
 
+        for (Element link : links) {
+            String pdfLink = link.absUrl("href");
+            String fileName = link.text().replaceAll("[^a-zA-Z0-9.-]", "_") + ".pdf";
+
+          if (fileName.toLowerCase().contains("anexo_i") || fileName.toLowerCase().contains("anexo_ii")) {
+             System.out.println("Baixando: " + pdfLink);
+             baixarArquivos(pdfLink, fileName);
+          }
+        }
+
     }
-    private void baixarArquivos(String arquivoURL, String savePath) throws IOException {
+    private static void baixarArquivos(String arquivoURL, String savePath) throws IOException {
         try (InputStream in = new URL(arquivoURL).openStream();
              FileOutputStream out = new FileOutputStream(savePath)) {
             byte[] buffer = new byte[1024];
