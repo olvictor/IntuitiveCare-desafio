@@ -25,11 +25,11 @@ public class ScrapingService {
 
         for (Element link : links) {
             String pdfLink = link.absUrl("href");
-            String fileName = link.text().replaceAll("[^a-zA-Z0-9.-]", "_") + ".pdf";
+            String fileName = link.text().replaceAll("[^a-zA-Z0-9.-]", "_") + "pdf";
 
           if (fileName.toLowerCase().contains("anexo_i") || fileName.toLowerCase().contains("anexo_ii")) {
              System.out.println("Baixando: " + pdfLink);
-             baixarArquivos(pdfLink, fileName);
+             baixarArquivos(pdfLink, DIRETORIO_DOWN + fileName);
           }
         }
 
