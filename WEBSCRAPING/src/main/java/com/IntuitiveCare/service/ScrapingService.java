@@ -16,26 +16,30 @@ public class ScrapingService {
     private static final String DIRETORIO_DOWN = "downloads/";
     private static final String ARQUIVOS_ZIP = "anexos.zip";
 
-    public static void scraping(String url) throws IOException {
+    public static String scraping(String url) throws IOException {
 
-        Files.createDirectories(Paths.get(DIRETORIO_DOWN));
+        try{
+            Files.createDirectories(Paths.get(DIRETORIO_DOWN));
 
-        Document documento = Jsoup.connect(url).get();
-        Elements links = documento.select("a[href$=.pdf]");
+            Document documento = Jsoup.connect(url).get();
+            Elements links = documento.select("a[href$=.pdf]");
 
-        for (Element link : links) {
-            String pdfLink = link.absUrl("href");
-            String fileName = link.text().replaceAll("[^a-zA-Z0-9.-]", "_") + "pdf";
+            for (Element link : links) {
+                String pdfLink = link.absUrl("href");
+                String fileName = link.text().replaceAll("[^a-zA-Z0-9.-]", "_") + "pdf";
 
-          if (fileName.toLowerCase().contains("anexo_i") || fileName.toLowerCase().contains("anexo_ii")) {
-             System.out.println("Baixando: " + pdfLink);
-             baixarArquivos(pdfLink, DIRETORIO_DOWN + fileName);
-          }
+                if (fileName.toLowerCase().contains("anexo_i") || fileName.toLowerCase().contains("anexo_ii")) {
+                    System.out.println("Baixando: " + pdfLink);
+                    baixarArquivos(pdfLink, DIRETORIO_DOWN + fileName);
+                }
 
-          ziparArquivos(DIRETORIO_DOWN, DIRETORIO_DOWN + ARQUIVOS_ZIP);
+                ziparArquivos(DIRETORIO_DOWN, DIRETORIO_DOWN + ARQUIVOS_ZIP);
+            }
+        }catch(Exception erro){
+            return "Ocorreu um erro durante a execução do programa:"+ erro.getMessage();
 
         }
-
+        return "O processo foi concluído com sucesso os arquivos baixados estão na pasta de downloads.";
     }
     private static void baixarArquivos(String arquivoURL, String savePath) throws IOException {
         try (InputStream in = new URL(arquivoURL).openStream();
